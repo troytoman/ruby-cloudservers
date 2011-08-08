@@ -8,6 +8,7 @@ module CloudServers
     attr_reader :created
     attr_reader :status
     attr_reader :progress
+    attr_reader :uri
     
     # This class provides an object for the "Image" of a server.  The Image refers to the Operating System type and version.
     #
@@ -41,7 +42,8 @@ module CloudServers
       @created = DateTime.parse(data['created'])
       @status = data['status']
       @progress = data['progress']
-      return true
+      @uri = data['links'].first['href']
+      true
     end
     alias :refresh :populate
     

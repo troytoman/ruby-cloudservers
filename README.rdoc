@@ -17,6 +17,21 @@ This source is available on Github[http://github.com/rackspace/ruby-cloudservers
 To use it in a Rails application, add the following information to your config/environment.rb
 
   config.gem "cloudservers"
+
+== Nova Alpha Examples
+
+# Authenticate and get token
+cs = CloudServers::Connection.new(:username => 'username', :api_key => 'apikey', :auth_url => CloudServers::AUTH_ALPHA)
+
+cs.images                     # list available images
+cs.flavors                    # list available flavors
+image = cs.get_image(37)      # get a image details
+flavor = cs.get_flavor(2)     # get flavor details
+newserver = cs.create_server(:name => "Alpha Server", :imageRef => image.uri, :flavorRef => flavor.id)       # create a server
+cs.servers                    # list servers
+cs.get_server(ID)             # get server details
+newserver.reboot              # reboot
+newserver.delete!             # delete
   
 
 == Examples

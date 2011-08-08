@@ -14,6 +14,7 @@ module CloudServers
     attr_reader   :auth_scheme
     attr_reader   :proxy_host
     attr_reader   :proxy_port
+    attr_reader   :auth_version
     
     # Creates a new CloudServers::Connection object.  Uses CloudServers::Authentication to perform the login for the connection.
     #
@@ -39,6 +40,11 @@ module CloudServers
       @authuser = options[:username] || (raise Exception::Authentication, "Must supply a :username")
       @authkey = options[:api_key] || (raise Exception::Authentication, "Must supply an :api_key")
       @auth_url = options[:auth_url] || @auth_url = CloudServers::AUTH_USA
+      if @auth_url == CloudServers::AUTH_ALPHA then
+        @auth_version = '/v1.1'
+      else
+        @auth_version = '/v1.0'
+      end
 
       auth_uri=nil
       begin
@@ -166,7 +172,7 @@ module CloudServers
     #   >> server.adminPass
     #   => "NewServerSHMGpvI"
     def create_server(options)
-      raise CloudServers::Exception::MissingArgument, "Server name, flavor ID, and image ID must be supplied" unless (options[:name] && options[:flavorId] && options[:imageId])
+      raise CloudServers::Exception::MissingArgument, "Server name, flavor ID, and image ID or imageRef must be supplied" unless (options[:name] && (options[:flavorId] || options[:flavorRef]) && (options[:imageId]) || options[:imageRef])
       options[:personality] = get_personality(options[:personality])
       raise TooManyMetadataItems, "Metadata is limited to a total of #{MAX_PERSONALITY_METADATA_ITEMS} key/value pairs" if options[:metadata].is_a?(Hash) && options[:metadata].keys.size > MAX_PERSONALITY_METADATA_ITEMS
       data = JSON.generate(:server => options)

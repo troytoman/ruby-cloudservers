@@ -44,6 +44,7 @@ module CloudServers
       response = @connection.csreq("GET",@svrmgmthost,"#{@svrmgmtpath}/servers/#{URI.encode(@id.to_s)}",@svrmgmtport,@svrmgmtscheme)
       CloudServers::Exception.raise_exception(response) unless response.code.match(/^20.$/)
       data = JSON.parse(response.body)["server"]
+
       @id        = data["id"]
       @name      = data["name"]
       @status    = data["status"]
@@ -51,8 +52,15 @@ module CloudServers
       @addresses = CloudServers.symbolize_keys(data["addresses"])
       @metadata  = data["metadata"]
       @hostId    = data["hostId"]
-      @imageId   = data["imageId"]
-      @flavorId  = data["flavorId"]
+      if @svrmgmtpath=="/v1.1" then
+        image      = CloudServers.symbolize_keys(data["image"])
+        @imageId   = image[:id]
+        flavor     = CloudServers.symbolize_keys(data["flavor"])
+        @flavorId  = flavor[:id]
+      else
+        @imageId   = data["imageId"]
+        @flavorId  = data["flavorId"]
+      end
       true
     end
     alias :refresh :populate
@@ -119,6 +127,15 @@ module CloudServers
       self.populate if options[:name]
       true
     end
+
+    def change_password(options)
+      data = JSON.generate(:server => options)
+      response = @connection.csreq("PUT",@svrmgmthost,"#{@svrmgmtpath}/servers/#{URI.encode(self.id.to_s)}",@svrmgmtport,@svrmgmtscheme,{'content-type' => 'application/json'},data)
+      CloudServers::Exception.raise_exception(response) unless response.code.match(/^20.$/)
+      # If we rename the instance, repopulate the object
+      self.populate if options[:name]
+      true
+    end
     
     # Deletes the server from Cloud Servers.  The server will be shut down, data deleted, and billing stopped.
     #
@@ -142,7 +159,13 @@ module CloudServers
     #   >> server.rebuild!
     #   => true
     def rebuild!(imageId = self.imageId)
-      data = JSON.generate(:rebuild => {:imageId => imageId})
+
+      if @svrmgmtpath=="/v1.1" then
+        image      = @connection.get_image(@imageId)
+        data = JSON.generate(:rebuild => {:imageRef => image.uri})
+      else
+        data = JSON.generate(:rebuild => {:imageId => imageId})
+      end
       response = @connection.csreq("POST",@svrmgmthost,"#{@svrmgmtpath}/servers/#{URI.encode(self.id.to_s)}/action",@svrmgmtport,@svrmgmtscheme,{'content-type' => 'application/json'},data)
       CloudServers::Exception.raise_exception(response) unless response.code.match(/^20.$/)
       self.populate

@@ -35,5 +35,10 @@ class CloudServersConnectionTest < Test::Unit::TestCase
       conn = CloudServers::Connection.new(:username => "test_account", :api_key => "AABBCCDD11", :auth_url => CloudServers::AUTH_UK)
       assert_not_nil conn, "Connection.new returned nil."
   end
+
+  def test_init_connection_with_custom_auth_url
+      conn = CloudServers::Connection.new(:username => "test_account", :api_key => "AABBCCDD11", :auth_url => CloudServers::AUTH_ALPHA)
+      assert_not_nil conn, "Connection.new returned nil."
+  end
     
 end

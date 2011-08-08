@@ -5,9 +5,9 @@ Gem::Specification.new do |s|
   s.version = CloudServers::VERSION
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
-  s.authors = ["H. Wade Minter", "Mike Mayo", "Dan Prince"]
-  s.date = %q{2011-02-02}
-  s.description = %q{A Ruby API to version 1.0 of the Rackspace Cloud Servers product.}
+  s.authors = ["H. Wade Minter", "Mike Mayo", "Dan Prince", "Troy Toman"]
+  s.date = %q{2011-08-08}
+  s.description = %q{A Ruby API to version 1.1 of the Rackspace Cloud Servers product. EARLY ACCESS}
   s.email = %q{minter@lunenburg.org}
   s.extra_rdoc_files = [
     "README.rdoc",

@@ -39,6 +39,22 @@ class CloudServersServersTest < Test::Unit::TestCase
 
   end
 
+  def test_get_server11
+
+    server=get_test_server11
+    assert_equal "sample-server", server.name
+    assert_equal "52415800-8b69-11e0-9b19-734f6f006e54", server.imageId
+    assert_equal "52415800-8b69-11e0-9b19-734f216543fd", server.flavorId
+    assert_equal "e4d909c290d0fb1ca068ffaddf22cbd0", server.hostId
+    assert_equal "BUILD", server.status
+    assert_equal 60, server.progress
+    assert_equal "67.23.10.132", server.addresses[:public][0][:addr]
+    assert_equal "::babe:67.23.10.132", server.addresses[:public][1][:addr]
+    assert_equal "10.176.42.16", server.addresses[:private][0][:addr]
+
+  end
+
+
   def test_share_ip
 
     server=get_test_server
@@ -172,6 +188,17 @@ private
     @conn.stubs(:csreq).returns(response)
     return @conn.server(1234) 
 
+  end
+
+  def get_test_server11
+
+    response = mock()
+    response.stubs(:code => "200", :body => fixture('test_server11.json'))
+
+    @conn=get_test_connection11
+
+    @conn.stubs(:csreq).returns(response)
+    return @conn.server("52415800-8b69-11e0-9b19-734f000004d2")
   end
 
 end
