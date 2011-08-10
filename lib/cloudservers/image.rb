@@ -42,7 +42,9 @@ module CloudServers
       @created = DateTime.parse(data['created'])
       @status = data['status']
       @progress = data['progress']
-      @uri = data['links'].first['href']
+      if @connection.svrmgmtpath == "/v1.1" then
+        @uri = data['links'].first['href']
+      end
       true
     end
     alias :refresh :populate
