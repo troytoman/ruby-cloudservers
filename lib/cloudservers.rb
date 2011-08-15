@@ -42,6 +42,7 @@ module CloudServers
   require 'cloudservers/flavor'
   require 'cloudservers/shared_ip_group'
   require 'cloudservers/exception'
+  require 'cloudservers/address'
   
   # Constants that set limits on server creation
   MAX_PERSONALITY_ITEMS = 5

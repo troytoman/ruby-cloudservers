@@ -37,6 +37,11 @@ class CloudServersServersTest < Test::Unit::TestCase
     assert_equal "67.23.10.131", server.addresses[:public][1]
     assert_equal "10.176.42.16", server.addresses[:private][0]
 
+    assert_equal "67.23.10.132", server.addresses[0].address
+    assert_equal "67.23.10.131", server.addresses[1].address
+    assert_equal "10.176.42.16", server.addresses[2].address
+
+    assert_equal "67.23.10.132", server.accessipv4
   end
 
   def test_get_server11
@@ -48,9 +53,27 @@ class CloudServersServersTest < Test::Unit::TestCase
     assert_equal "e4d909c290d0fb1ca068ffaddf22cbd0", server.hostId
     assert_equal "BUILD", server.status
     assert_equal 60, server.progress
-    assert_equal "67.23.10.132", server.addresses[:public][0][:addr]
-    assert_equal "::babe:67.23.10.132", server.addresses[:public][1][:addr]
-    assert_equal "10.176.42.16", server.addresses[:private][0][:addr]
+    assert_equal "67.23.10.132", server.addresses[0].address
+    assert_equal "public", server.addresses[0].label
+    assert_equal 4, server.addresses[0].version
+    assert_equal "::babe:67.23.10.132", server.addresses[1].address
+    assert_equal "public", server.addresses[1].label
+    assert_equal 6, server.addresses[1].version
+    assert_equal "67.23.10.131", server.addresses[2].address
+    assert_equal "public", server.addresses[2].label
+    assert_equal 4, server.addresses[2].version
+    assert_equal "::babe:4317:0A83", server.addresses[3].address
+    assert_equal "public", server.addresses[3].label
+    assert_equal 6, server.addresses[3].version
+    assert_equal "10.176.42.16", server.addresses[4].address
+    assert_equal "private", server.addresses[4].label
+    assert_equal 4, server.addresses[4].version
+    assert_equal "::babe:10.176.42.16", server.addresses[5].address
+    assert_equal "private", server.addresses[5].label
+    assert_equal 6, server.addresses[5].version
+
+    assert_equal "67.23.10.132", server.accessipv4
+    assert_equal "::babe:67.23.10.132", server.accessipv6
 
   end
 

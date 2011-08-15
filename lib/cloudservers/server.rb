@@ -6,6 +6,8 @@ module CloudServers
     attr_reader   :status
     attr_reader   :progress
     attr_reader   :addresses
+    attr_reader   :accessipv4
+    attr_reader   :accessipv6
     attr_reader   :metadata
     attr_reader   :hostId
     attr_reader   :imageId
@@ -49,18 +51,14 @@ module CloudServers
       @name      = data["name"]
       @status    = data["status"]
       @progress  = data["progress"]
-      @addresses = CloudServers.symbolize_keys(data["addresses"])
+      @accessipv4 = data["accessIPv4"]
+      @accessipv6 = data["accessIPv6"]
+      @addresses = get_addresses(data["addresses"])
       @metadata  = data["metadata"]
       @hostId    = data["hostId"]
-      if @svrmgmtpath=="/v1.1" then
-        image      = CloudServers.symbolize_keys(data["image"])
-        @imageId   = image[:id]
-        flavor     = CloudServers.symbolize_keys(data["flavor"])
-        @flavorId  = flavor[:id]
-      else
-        @imageId   = data["imageId"]
-        @flavorId  = data["flavorId"]
-      end
+      @imageId   = get_image(data)
+      @flavorId  = get_flavor(data)
+
       true
     end
     alias :refresh :populate
@@ -300,6 +298,37 @@ module CloudServers
       response = @connection.csreq("DELETE",@svrmgmthost,"#{@svrmgmtpath}/servers/#{URI.encode(self.id.to_s)}/ips/public/#{options[:ipAddress]}",@svrmgmtport,@svrmgmtscheme)
       CloudServers::Exception.raise_exception(response) unless response.code.match(/^20.$/)
       true
+    end
+
+    def get_addresses(address_info)
+      address_list = CloudServers::AddressList.new
+      address_info.each do |label, addr|
+        addr.each do |address|
+          address_list << CloudServers::Address.new(label,address)
+          if address_list.last.version == 4 && !@accessipv4 then
+            @accessipv4 = address_list.last.address
+          end
+        end
+      end
+      address_list
+    end
+
+    def get_flavor(data)
+      if @svrmgmtpath=="/v1.1" then
+        flavor     = CloudServers.symbolize_keys(data["flavor"])
+        flavorId  = flavor[:id]
+      else
+        flavorId  = data["flavorId"]
+      end
+    end
+
+    def get_image(data)
+      if @svrmgmtpath=="/v1.1" then
+        image      = CloudServers.symbolize_keys(data["image"])
+        imageId   = image[:id]
+      else
+        imageId   = data["imageId"]
+      end
     end
  
   end
