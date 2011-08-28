@@ -47,6 +47,8 @@ module CloudServers
       CloudServers::Exception.raise_exception(response) unless response.code.match(/^20.$/)
       data = JSON.parse(response.body)["server"]
 
+      #puts data.inspect
+
       @id        = data["id"]
       @name      = data["name"]
       @status    = data["status"]
@@ -305,7 +307,7 @@ module CloudServers
       address_info.each do |label, addr|
         addr.each do |address|
           address_list << CloudServers::Address.new(label,address)
-          if address_list.last.version == 4 && !@accessipv4 then
+          if address_list.last.version == 4 && (!@accessipv4 || accessipv4 == "") then
             @accessipv4 = address_list.last.address
           end
         end
@@ -314,7 +316,7 @@ module CloudServers
     end
 
     def get_flavor(data)
-      if @svrmgmtpath=="/v1.1" then
+      if @svrmgmtpath[0..4]=="/v1.1" then
         flavor     = CloudServers.symbolize_keys(data["flavor"])
         flavorId  = flavor[:id]
       else
@@ -323,7 +325,7 @@ module CloudServers
     end
 
     def get_image(data)
-      if @svrmgmtpath=="/v1.1" then
+      if @svrmgmtpath[0..4]=="/v1.1" then
         image      = CloudServers.symbolize_keys(data["image"])
         imageId   = image[:id]
       else

@@ -35,6 +35,7 @@ module CloudServers
       response = @connection.csreq("GET",@connection.svrmgmthost,"#{@connection.svrmgmtpath}/images/#{URI.escape(self.id.to_s)}",@connection.svrmgmtport,@connection.svrmgmtscheme)
       CloudServers::Exception.raise_exception(response) unless response.code.match(/^20.$/)
       data = JSON.parse(response.body)['image']
+      puts data.inspect
       @id = data['id']
       @name = data['name']
       @serverId = data['serverId']
@@ -42,7 +43,7 @@ module CloudServers
       @created = DateTime.parse(data['created'])
       @status = data['status']
       @progress = data['progress']
-      if @connection.svrmgmtpath == "/v1.1" then
+      if @connection.svrmgmtpath[0..4] == "/v1.1" then
         @uri = data['links'].first['href']
       end
       true
